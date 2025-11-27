@@ -1,0 +1,32 @@
+name: Safe Market Scanner
+
+on:
+  schedule:
+    # Run every 5 minutes from 9:00 AM to 3:35 PM IST
+    # Cron Calculation: IST - 5.5 Hours = UTC
+    # 09:00 IST = 03:30 UTC
+    # 15:35 IST = 10:05 UTC
+    - cron: '*/5 3-10 * * 1-5' # Mon-Fri
+  
+  workflow_dispatch: # Allows manual test
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install Libraries
+        run: pip install yfinance pandas requests pytz
+        
+      - name: Run Script
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python alert_bot.py
